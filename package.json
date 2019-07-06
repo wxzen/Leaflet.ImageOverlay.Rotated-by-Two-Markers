@@ -1,0 +1,17 @@
+{
+  "name": "leaflet-imageoverlay-rotated-by-two-markers",
+  "version": "0.1.3",
+  "description": "Displays rotated/scale/repositoin image overlays in Leaflet",
+  "main": "index.js",
+  "dependencies": {
+    "leaflet": "^1.0.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "leaflet"
+  ],
+  "authors": [
+    "David Xu <davidbravely@outlook.com>"
+  ],
+  "license": "Beerware"
+}
