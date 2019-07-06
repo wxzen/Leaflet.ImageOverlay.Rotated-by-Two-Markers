@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 # Leaflet.ImageOverlay.Rotated-by-Two-Markers
 I modified the image overlay plugin for better usage, the original plugin is this link:
 https://github.com/IvanSanchez/Leaflet.ImageOverlay.Rotated
@@ -9,6 +7,9 @@ Just check the codes and know how :
 index.html
 utils.js
 Leaflet.ImageOverlay.Rotated.js
+
+# Demo show
+![Alt Text](images/show.gif) 
 
 ### Using the code in other projects
 
@@ -39,6 +40,3 @@ this stuff is worth it, you can buy me a beer in return.
 
 ----------------------------------------------------------------------------
 
-=======
-# Leaflet.ImageOverlay.Rotated-by-Two-Markers
->>>>>>> c24f7acb829b7cfbbad3eeecb4de60c5770f43f2
