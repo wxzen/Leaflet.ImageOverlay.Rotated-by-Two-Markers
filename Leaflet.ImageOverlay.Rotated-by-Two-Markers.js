@@ -2,23 +2,7 @@
  * 🍂class ImageOverlay.Rotated
  * 🍂inherits ImageOverlay
  *
- * Like `ImageOverlay`, but rotates and skews the image. This is done by using
- * *three* control points instead of *two*.
- *
- * @example
- *
- * ```
- * var topleft    = L.latLng(40.52256691873593, -3.7743186950683594),
- * 	topright   = L.latLng(40.5210255066156, -3.7734764814376835),
- * 	bottomleft = L.latLng(40.52180437272552, -3.7768453359603886);
- *
- * var overlay = L.imageOverlay.rotated("./palacio.jpg", topleft, topright, bottomleft, {
- * 	opacity: 0.4,
- * 	interactive: true,
- * 	attribution: "&copy; <a href='http://www.ign.es'>Instituto Geográfico Nacional de España</a>"
- * });
- * ```
- *
+ * Like `ImageOverlay`, use two points rotates and skews the image. 
  */
 
 L.ImageOverlay.Rotated = L.ImageOverlay.extend({

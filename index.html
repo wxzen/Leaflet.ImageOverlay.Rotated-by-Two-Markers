@@ -11,20 +11,10 @@
 <body>
 	<div id="map" style='width:800px; height:600px;'></div>
 	<script type="text/javascript">
-	var width = 800,
-	    height = 600;
-
-    var latlngs = [
-		L.latLng(31.844586799627216, 117.19331510782506),   //top left
-		L.latLng(31.844602001694046, 117.19368499519082),  //top right
-		L.latLng(31.84435113973027, 117.19332852958816),  //bottom left
-        L.latLng(31.844366341835958, 117.19369841695394),   //bottom right          
-    ];
-
-	var topLeftPoint = latlngs[0],
-        topRightPoint = latlngs[1],
-        bottomLeftPoint = latlngs[2],
-        bottomRightPoint = latlngs[3];
+	var topLeftPoint = L.latLng(31.844586799627216, 117.19331510782506),
+        topRightPoint = L.latLng(31.844602001694046, 117.19368499519082),
+        bottomLeftPoint = L.latLng(31.84435113973027, 117.19332852958816),
+        bottomRightPoint =  L.latLng(31.844366341835958, 117.19369841695394);
 		
 	var imgUrl = "demo.jpg";
 
@@ -51,9 +41,7 @@
 		corners:[topLeftPoint,
                  topRightPoint,
                  bottomRightPoint,
-                 bottomLeftPoint],
-		w: null,
-		h: null
+                 bottomLeftPoint]
     });
     
     map.addLayer(overlay);
