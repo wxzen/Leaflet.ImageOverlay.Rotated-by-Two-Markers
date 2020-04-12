@@ -23,8 +23,7 @@
 
 L.ImageOverlay.Rotated = L.ImageOverlay.extend({
 
-	initialize: function (image, topleft, topright, bottomleft, options) {
-
+	initialize: function (image, topRightMarker,bottomLeftMarker, options) {
 		if (typeof(image) === 'string') {
 			this._url = image;
 		} else {
@@ -32,12 +31,18 @@ L.ImageOverlay.Rotated = L.ImageOverlay.extend({
 			this._rawImage = image;
 		}
 
-		this._topLeft    = L.latLng(topleft);
-		this._topRight   = L.latLng(topright);
-		this._bottomLeft = L.latLng(bottomleft);
+		this.topRightMarker = topRightMarker;
+		this.bottomLeftMarker = bottomLeftMarker;
         this.angle = 0;
 
 		L.setOptions(this, options);
+
+		this._topLeft    = L.latLng(options.corners[0]);
+		this._topRight   = L.latLng(options.corners[1]);
+		this._bottomLeft = L.latLng(options.corners[3]);
+
+		topRightMarker.on('drag dragend', this.reposition.bind(this));
+		bottomLeftMarker.on('drag dragend', this.reposition.bind(this));
 	},
 
 
@@ -101,8 +106,11 @@ L.ImageOverlay.Rotated = L.ImageOverlay.extend({
 		img.onload = function(){
 			this._reset();
 			img.style.display = 'block';
-
-
+			this.options.w = this._rawImage.width;
+			this.options.h = this._rawImage.height;
+			this.boundsRectBottomLeft= L.point(0, 0);// origin
+			this.boundsRectTopRight= L.point(this.options.w, this.options.h);
+			this.diagonalVector = this.boundsRectTopRight.subtract(this.boundsRectBottomLeft); 
 			this.fire('load');
 
 		}.bind(this);
@@ -169,16 +177,42 @@ L.ImageOverlay.Rotated = L.ImageOverlay.extend({
         var scale = this._map.getZoomScale(e.zoom),
             newBounds = this._map._latLngBoundsToNewLayerBounds(this._bounds, e.zoom, e.center),
             offset = newBounds.min;
-        // console.log('_animationZoom: ',newBounds);
         L.DomUtil.setTransform(this._image, offset, scale);
     },
 
-	reposition: function(topleft, topright, bottomleft) {
-		this._topLeft    = L.latLng(topleft);
-		this._topRight   = L.latLng(topright);
-		this._bottomLeft = L.latLng(bottomleft);
+	reposition: function() {
+		var tRlnglat = this.topRightMarker.getLatLng();
+		var bLlnglat = this.bottomLeftMarker.getLatLng();
+		var imgWidth = this.options.w;
+        var imgHeight = this.options.h;
+        
+        var c1 = this.getCornerLatLng(L.point(0, imgHeight), bLlnglat, tRlnglat);  // raw image topleft
+        var c2 = this.getCornerLatLng(L.point(imgWidth, imgHeight), bLlnglat, tRlnglat);  // raw image topright
+        var c3 = this.getCornerLatLng(L.point(0, 0), bLlnglat, tRlnglat);  // raw image bottomLeft
+		var c4 = this.getCornerLatLng(L.point(imgWidth, 0), bLlnglat, tRlnglat);
+		
+		this.options.corners = [c1,c2,c3,c4];
+
+		this._topLeft    = L.latLng(c1);
+		this._topRight   = L.latLng(c2);
+		this._bottomLeft = L.latLng(c3);
 		this._reset();
 
+	},
+
+	getCornerLatLng: function(point, bottomLeftMarkerLatLng, topRightMarkerLatLng){
+		var boundsRectBottomLeft= this.boundsRectBottomLeft;
+		var diagonalVector = this.diagonalVector;
+		var pV = point.subtract(boundsRectBottomLeft); 
+		var rotate90V = getClockWiseRotate90DegreePoint(diagonalVector);
+		var scaleX = getDotProduction(diagonalVector, pV) / getDotProduction(diagonalVector, diagonalVector);
+		var scaleY = -getDotProduction(rotate90V, pV) / getDotProduction(rotate90V, rotate90V);
+		var bLMarkerPx = L.Projection.SphericalMercator.project(bottomLeftMarkerLatLng);
+		var tRMarkerPx = L.Projection.SphericalMercator.project(topRightMarkerLatLng);
+		var vx = bLMarkerPx.add(tRMarkerPx.subtract(bLMarkerPx).multiplyBy(scaleX));
+		var vy = getClockWiseRotate90DegreePoint(bLMarkerPx.subtract(tRMarkerPx)).multiplyBy(scaleY);
+		var p = vx.add(vy);
+		return L.Projection.SphericalMercator.unproject(p);
 	},
 
 	setUrl: function (url) {
@@ -191,6 +225,15 @@ L.ImageOverlay.Rotated = L.ImageOverlay.extend({
 	}
 });
 
+
+function getClockWiseRotate90DegreePoint(point){
+	return L.point([point.y, -point.x]);
+}
+
+function getDotProduction(point1, point2){
+	return point1.x * point2.x + point1.y * point2.y;
+}
+
 /* 🍂factory imageOverlay.rotated(imageUrl: String|HTMLImageElement|HTMLCanvasElement, topleft: LatLng, topright: LatLng, bottomleft: LatLng, options?: ImageOverlay options)
  * Instantiates a rotated/skewed image overlay, given the image URL and
  * the `LatLng`s of three of its corners.
@@ -198,6 +241,6 @@ L.ImageOverlay.Rotated = L.ImageOverlay.extend({
  * Alternatively to specifying the URL of the image, an existing instance of `HTMLImageElement`
  * or `HTMLCanvasElement` can be used.
  */
-L.imageOverlay.rotated = function(imgSrc, topleft, topright, bottomleft, options) {
-	return new L.ImageOverlay.Rotated(imgSrc, topleft, topright, bottomleft, options);
+L.imageOverlay.rotated = function(imgSrc, topRightMarker, bottomLeftMarker, options) {
+	return new L.ImageOverlay.Rotated(imgSrc, topRightMarker, bottomLeftMarker, options);
 };

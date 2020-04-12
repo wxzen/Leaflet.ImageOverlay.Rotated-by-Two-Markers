@@ -6,14 +6,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="leaflet.css"/>
 	<script src="leaflet.js"></script>
-	<script src="Leaflet.ImageOverlay.Rotated.js"></script>
-	<script src="utils.js"></script>
+	<script src="Leaflet.ImageOverlay.Rotated-by-Two-Markers.js"></script>
 </head>
 <body>
 	<div id="map" style='width:800px; height:600px;'></div>
 	<script type="text/javascript">
-    
-    // image with and height (px)
 	var width = 800,
 	    height = 600;
 
@@ -24,15 +21,11 @@
         L.latLng(31.844366341835958, 117.19369841695394),   //bottom right          
     ];
 
-
-
 	var topLeftPoint = latlngs[0],
         topRightPoint = latlngs[1],
         bottomLeftPoint = latlngs[2],
         bottomRightPoint = latlngs[3];
 		
-		
-
 	var imgUrl = "demo.jpg";
 
     var map = new L.Map('map',
@@ -48,49 +41,23 @@
         maxZoom: 24
     }).addTo(map);
 
-    var overlay = L.imageOverlay.rotated(imgUrl, topLeftPoint, topRightPoint, bottomLeftPoint, {
-		opacity: 0.9,
-		interactive: true,
-		corners:[topLeftPoint,
-                 topRightPoint,
-                 bottomLeftPoint,
-                 bottomRightPoint],
-		w: null,
-		h: null
-    });
-    
     //two control points
     var topRightMarker = L.marker(topRightPoint, {draggable: true} ).addTo(map);
     var bottomLeftMarker = L.marker(bottomLeftPoint, {draggable: true} ).addTo(map);
 
-	overlay.on('load', function (e) {
-		console.log(e, 'load');
-		this.options.w = this._rawImage.width;
-		this.options.h = this._rawImage.height;		
-		topRightMarker.options.coordinates = L.point(this.options.w, this.options.h);
-		bottomLeftMarker.options.coordinates = L.point(0, 0);
-    }).addTo(map);
+    var overlay = L.imageOverlay.rotated(imgUrl, topRightMarker,bottomLeftMarker, {
+		opacity: 0.9,
+		interactive: true,
+		corners:[topLeftPoint,
+                 topRightPoint,
+                 bottomRightPoint,
+                 bottomLeftPoint],
+		w: null,
+		h: null
+    });
     
-    function repositionImage() {
-        var bottomLeftCoord = bottomLeftMarker.options.coordinates,
-            bottomLeftLatLng = bottomLeftMarker.getLatLng(),
-            topRightCoord = topRightMarker.options.coordinates,
-            topRightLatLng = topRightMarker.getLatLng(),			
-            _width = overlay.options.w,
-            _height = overlay.options.h;
-        
-        overlay.options.corners = [
-            getCornerLatLng(L.point(0, _height), bottomLeftCoord, bottomLeftLatLng, topRightCoord, topRightLatLng),
-            getCornerLatLng(L.point(_width, _height), bottomLeftCoord, bottomLeftLatLng, topRightCoord, topRightLatLng),
-            getCornerLatLng(L.point(0, 0), bottomLeftCoord, bottomLeftLatLng, topRightCoord, topRightLatLng),
-            getCornerLatLng(L.point(_width, 0), bottomLeftCoord, bottomLeftLatLng, topRightCoord, topRightLatLng)
-        ];
-        overlay.reposition(overlay.options.corners[0],overlay.options.corners[1],overlay.options.corners[2])
-    }
+    map.addLayer(overlay);
 
-    topRightMarker.on('drag dragend', repositionImage).on("click", (e)=>{console.log('topRightMarker');})
-    bottomLeftMarker.on('drag dragend', repositionImage).on("click", (e)=>{console.log("bottomLeftMarker")});
-	
 	</script>
 </body>
 </html>
