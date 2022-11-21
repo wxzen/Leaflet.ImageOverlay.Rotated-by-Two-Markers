@@ -146,15 +146,12 @@ L.ImageOverlay.Rotated = L.ImageOverlay.extend({
 			return;	// Probably because the image hasn't loaded yet.
 		}
 
-		var scaleX = pxTopLeft.distanceTo(pxTopRight)   / imgW * Math.cos(skewX);
-		var scaleY = pxTopLeft.distanceTo(pxBottomLeft) / imgH * Math.cos(skewY);
-
 		this._rawImage.style.transformOrigin = '0 0';
 
 		this._rawImage.style.transform =
-			'translate(' + pxTopLeftInDiv.x + 'px, ' + pxTopLeftInDiv.y + 'px)' +
-			'skew(' + skewY + 'rad, ' + skewX + 'rad) ' +
-			'scale(' + scaleX + ', ' + scaleY + ') ';
+			`matrix(${vectorX.x / imgW}, ${vectorX.y / imgW}, 
+			        ${vectorY.x / imgH}, ${vectorY.y / imgH},
+					${pxTopLeftInDiv.x}, ${pxTopLeftInDiv.y})`;
 
 	},
     _animateZoom: function (e) {
